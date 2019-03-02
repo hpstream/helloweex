@@ -23295,7 +23295,7 @@ exports = module.exports = __webpack_require__(2)(false);
 
 
 // module
-exports.push([module.i, "\n.item-container[data-v-04a7eba6] {\n  width: 10rem;\n  background-color: #f2f3f4;\n  align-items: center;\n  justify-content: center;\n}\n", ""]);
+exports.push([module.i, "\n.item-container[data-v-04a7eba6] {\n  width: 10rem;\n  background-color: #f2f3f4;\n}\n", ""]);
 
 // exports
 
@@ -23397,19 +23397,29 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 
 var stream = weex.requireModule('stream');
 
 // https://github.com/alibaba/weex-ui/blob/master/example/tab-bar/config.js
+
+var modal = weex.requireModule('modal') || {};
+var API = 'https://kitsu.io/api/edge/anime?filter%5Bstatus%5D=current&sort=-userCount&page%5Blimit%5D=20';
 exports.default = {
   components: { WxcTabBar: _wxcTabBar2.default, wxcButton: _wxcButton3.default },
   data: function data() {
     return {
       tabTitles: _config2.default.tabTitles,
       tabStyles: _config2.default.tabStyles,
-      count: 0,
-      reason: '',
-      result: []
+      items: [],
+      firstId: 1
     };
   },
   created: function created() {
@@ -23419,34 +23429,51 @@ exports.default = {
     var tabStyles = this.tabStyles;
 
     this.contentStyle = { height: tabPageHeight - tabStyles.height + 'px' };
+    var self = this;
+    stream.fetch({
+      method: 'GET',
+      url: API,
+      type: 'json'
+    }, function (ret) {
+      if (!ret.ok) {
+        modal.toast({
+          message: 'Network Error!',
+          duration: 3
+        });
+      } else {
+        self.firstId = ret.data.data[0].id;
+        self.items = self.items.concat(ret.data.data);
+      }
+    });
   },
   mounted: function mounted() {
-    this.wxcButtonClicked();
+    this.ajax();
   },
 
   methods: {
-    wxcButtonClicked: function wxcButtonClicked() {
-      var _this = this;
-
-      this.count = this.count + 1;
-      stream.fetch({
-        method: 'GET',
-        type: 'jsonp',
-        url: 'http://v.juhe.cn/joke/content/list.php?key=b2bbac3e44840eb124aa325a55097fec'
-      }, function (res) {
-        console.log(res.data.reason);
-        _this.reason = res.data.reason;
-        if (res.ok) {
-          // console.log(res.data.result)
-          _this.result = res.data.result;
-        } else {
-          // console.log(res)
-        }
-      });
-    },
     wxcTabBarCurrentTabSelected: function wxcTabBarCurrentTabSelected(e) {
       var index = e.page;
       console.log(index);
+    },
+
+    ajax: function ajax(e) {
+      var self = this;
+      var offset = this.items.length;
+
+      stream.fetch({
+        method: 'GET',
+        url: API + ('&page%5Boffset%5D=' + offset),
+        type: 'json'
+      }, function (ret) {
+        if (!ret.ok) {
+          modal.toast({
+            message: 'Network Error!',
+            duration: 3
+          });
+        } else {
+          self.items = self.items.concat(ret.data.data);
+        }
+      });
     }
   }
 };
@@ -24959,33 +24986,15 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     attrs: {
       "weex-type": "div"
     }
-  }, [_c('p', {
-    staticClass: " weex-el weex-text",
-    attrs: {
-      "weex-type": "text"
-    }
-  }, [_vm._v("首页" + _vm._s(_vm.count))]), _vm._v(" "), _c('p', {
-    staticClass: " weex-el weex-text",
-    attrs: {
-      "weex-type": "text"
-    }
-  }, [_vm._v(_vm._s(_vm.reason))]), _vm._v(" "), _vm._l((_vm.result), function(item) {
-    return _c('div', {
-      key: item.hashId,
-      staticClass: " weex-ct weex-div",
+  }, _vm._l((_vm.items), function(it) {
+    return _c('p', {
+      key: it.id,
+      staticClass: " weex-el weex-text",
       attrs: {
-        "weex-type": "div"
+        "weex-type": "text"
       }
-    }, [_vm._v("\n      " + _vm._s(item.content) + "\n    ")])
-  }), _vm._v(" "), _c('wxc-button', {
-    attrs: {
-      "text": "确定",
-      "data-evt-wxcButtonClicked": ""
-    },
-    on: {
-      "wxcButtonClicked": _vm.wxcButtonClicked
-    }
-  })], 2), _vm._v(" "), _c('div', {
+    }, [_vm._v(_vm._s(it.id))])
+  }), 0), _vm._v(" "), _c('div', {
     staticClass: "item-container weex-ct weex-div",
     style: (_vm._px2rem(_vm.contentStyle, 75)),
     attrs: {
