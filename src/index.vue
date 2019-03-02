@@ -39,6 +39,7 @@ import { WxcTabBar, wxcButton, Utils } from 'weex-ui'
 // https://github.com/alibaba/weex-ui/blob/master/example/tab-bar/config.js
 import Config from './utils/config.js'
 const stream = weex.requireModule('stream')
+const modal = weex.requireModule('modal') || {}
 export default {
   components: { WxcTabBar, wxcButton },
   data: () => ({
@@ -73,6 +74,10 @@ export default {
           this.result = res.data.result
         } else {
           // console.log(res)
+          modal.toast({
+            message: 'res.ok',
+            duration: 3
+          })
         }
       })
     },
