@@ -3263,6 +3263,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //
 //
 //
+//
 
 var stream = weex.requireModule('stream');
 
@@ -3273,6 +3274,8 @@ exports.default = {
     return {
       tabTitles: _config2.default.tabTitles,
       tabStyles: _config2.default.tabStyles,
+      count: 0,
+      reason: '',
       result: []
     };
   },
@@ -3292,17 +3295,19 @@ exports.default = {
     wxcButtonClicked: function wxcButtonClicked() {
       var _this = this;
 
-      console.log(1);
+      this.count = this.count + 1;
       stream.fetch({
         method: 'GET',
         type: 'jsonp',
-        url: 'https://v.juhe.cn/joke/randJoke.php?key=b2bbac3e44840eb124aa325a55097fec'
+        url: 'http://v.juhe.cn/joke/content/list.php?key=b2bbac3e44840eb124aa325a55097fec'
       }, function (res) {
+        console.log(res.data.reason);
+        _this.reason = res.data.reason;
         if (res.ok) {
-          console.log(res.data.result);
+          // console.log(res.data.result)
           _this.result = res.data.result;
         } else {
-          _this.count = '- unkonwn -';
+          // console.log(res)
         }
       });
     },
@@ -4769,7 +4774,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   }, [_c('div', {
     staticClass: ["item-container"],
     style: _vm.contentStyle
-  }, [_c('text', [_vm._v("首页")]), _vm._l((_vm.result), function(item) {
+  }, [_c('text', [_vm._v("首页" + _vm._s(_vm.count))]), _c('text', [_vm._v(_vm._s(_vm.reason))]), _vm._l((_vm.result), function(item) {
     return _c('div', {
       key: item.hashId
     }, [_vm._v("\n      " + _vm._s(item.content) + "\n    ")])

@@ -5,7 +5,8 @@
                @wxcTabBarCurrentTabSelected="wxcTabBarCurrentTabSelected">
     <!-- 第一个页面内容-->
     <div class="item-container" :style="contentStyle">
-      <text>首页</text>
+      <text>首页{{count}}</text>
+      <text>{{reason}}</text>
       <div v-for='item of result' :key="item.hashId">
         {{item.content}}
       </div>
@@ -43,6 +44,8 @@ export default {
   data: () => ({
     tabTitles: Config.tabTitles,
     tabStyles: Config.tabStyles,
+    count: 0,
+    reason: '',
     result: []
   }),
   created () {
@@ -57,17 +60,19 @@ export default {
   },
   methods: {
     wxcButtonClicked () {
-      console.log(1)
+      this.count = this.count + 1
       stream.fetch({
         method: 'GET',
         type: 'jsonp',
-        url: 'https://v.juhe.cn/joke/randJoke.php?key=b2bbac3e44840eb124aa325a55097fec'
+        url: 'http://v.juhe.cn/joke/content/list.php?key=b2bbac3e44840eb124aa325a55097fec'
       }, res => {
+        console.log(res.data.reason)
+        this.reason = res.data.reason
         if (res.ok) {
-          console.log(res.data.result)
+          // console.log(res.data.result)
           this.result = res.data.result
         } else {
-          this.count = '- unkonwn -'
+          // console.log(res)
         }
       })
     },
